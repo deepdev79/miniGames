@@ -1,0 +1,17 @@
+.gamebox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  gap: 20px;
+}
+
+.gamebox img {
+  width: 100px;
+  height: auto;
+}
+
+.options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}

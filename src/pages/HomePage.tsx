@@ -9,18 +9,18 @@ function HomePage() {
     <div>
       <h1>Mini Games</h1>
       <div className={styles.games}>
-        <GameBox gamepic={rpsImage}>
+        <GameBox gamepic={rpsImage} path="/rps">
           <p>
             Challenge the computer in this timeless game of strategy and luck
           </p>
         </GameBox>
-        <GameBox gamepic={ticTacToeImage}>
+        <GameBox gamepic={ticTacToeImage} path="/ttt">
           <p>
             Classic 3x3 battle against your friend. Can you find the perfect
             strategy?
           </p>
         </GameBox>
-        <GameBox gamepic={Pikachu}>
+        <GameBox gamepic={Pikachu} path="/pokemon">
           <p>Pokemon memory game</p>
         </GameBox>
       </div>
