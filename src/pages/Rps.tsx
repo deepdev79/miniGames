@@ -18,6 +18,8 @@ const initialState = {
   computerScore: 0,
   playerChoice: "Wait",
   computerChoice: "Wait",
+  buttonStatus: false,
+  message: "First to 5 wins the game",
 };
 
 function reducer(state, action) {
@@ -32,11 +34,29 @@ function reducer(state, action) {
   if (result === "playerWin") playerScore++;
   if (result === "computerWin") computerScore++;
 
-  return {
+  const baseState = {
     playerScore,
     computerScore,
     playerChoice: playerMove,
     computerChoice: computerMove,
+  };
+
+  if (playerScore === 5)
+    return {
+      ...baseState,
+      buttonStatus: true,
+      message: "Congrats 🥳 You win",
+    };
+  else if (computerScore === 5)
+    return {
+      ...baseState,
+      buttonStatus: true,
+      message: "😢 You lose",
+    };
+
+  return {
+    ...state,
+    ...baseState,
   };
 }
 
@@ -58,13 +78,20 @@ function gameLogic(playerChoice: string, computerMove: string) {
 
 function Rps() {
   const [
-    { playerScore, computerScore, playerChoice, computerChoice },
+    {
+      playerScore,
+      computerScore,
+      playerChoice,
+      computerChoice,
+      buttonStatus,
+      message,
+    },
     dispatch,
   ] = useReducer(reducer, initialState);
   return (
     <div>
       <h1>Welcome</h1>
-      <h3>First to 5 wins the game</h3>
+      <h3>{message}</h3>
       <div className={styles.gamebox}>
         <p>Your Hand</p>
         <p>Computer Hand</p>
@@ -74,9 +101,25 @@ function Rps() {
         <p>{computerScore}</p>
       </div>
       <div className={styles.options}>
-        <Button onClick={() => dispatch({ type: "Rock" })}>Rock</Button>
-        <Button onClick={() => dispatch({ type: "Paper" })}>Paper</Button>
-        <Button onClick={() => dispatch({ type: "Scissors" })}>Scissors</Button>
+        <Button
+          onClick={() => dispatch({ type: "Rock" })}
+          buttonStatus={buttonStatus}
+        >
+          Rock
+        </Button>
+        <Button
+          onClick={() => dispatch({ type: "Paper" })}
+          buttonStatus={buttonStatus}
+        >
+          {" "}
+          Paper
+        </Button>
+        <Button
+          onClick={() => dispatch({ type: "Scissors" })}
+          buttonStatus={buttonStatus}
+        >
+          Scissors
+        </Button>
       </div>
       <Button onClick={() => dispatch({ type: "reset" })}>Reset</Button>
     </div>
@@ -84,10 +127,12 @@ function Rps() {
 }
 interface ButtonProps {
   children: ReactNode;
+  onClick: () => void;
+  buttonStatus?: boolean;
 }
-function Button({ children, onClick }: ButtonProps) {
+function Button({ children, onClick, buttonStatus }: ButtonProps) {
   return (
-    <motion.button className="btn" onClick={onClick}>
+    <motion.button className="btn" onClick={onClick} disabled={buttonStatus}>
       {children}
     </motion.button>
   );
