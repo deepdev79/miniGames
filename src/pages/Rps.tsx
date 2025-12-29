@@ -12,8 +12,17 @@ const IMAGE_MAP: Record<string, string> = {
   Scissors: ScissorImage,
   Wait: waitImage,
 };
+type Choice = "Rock" | "Paper" | "Scissors" | "Wait";
 
-const initialState = {
+interface State {
+  playerScore: number;
+  computerScore: number;
+  playerChoice: Choice;
+  computerChoice: Choice;
+  buttonStatus: boolean;
+  message: string;
+}
+const initialState: State = {
   playerScore: 0,
   computerScore: 0,
   playerChoice: "Wait",
@@ -22,12 +31,14 @@ const initialState = {
   message: "First to 5 wins the game",
 };
 
-function reducer(state, action) {
+type Action = { type: "Rock" | "Paper" | "Scissors" } | { type: "reset" };
+
+function reducer(state: State, action: Action): State {
   if (action.type === "reset") return initialState;
 
-  const choices = ["Rock", "Paper", "Scissors"];
-  const playerMove = action.type;
-  const computerMove = choices[Math.floor(Math.random() * 3)];
+  const choices: Choice[] = ["Rock", "Paper", "Scissors"];
+  const playerMove: Choice = action.type;
+  const computerMove: Choice = choices[Math.floor(Math.random() * 3)];
 
   let { playerScore, computerScore } = state;
   const result = gameLogic(playerMove, computerMove);
@@ -111,7 +122,6 @@ function Rps() {
           onClick={() => dispatch({ type: "Paper" })}
           buttonStatus={buttonStatus}
         >
-          {" "}
           Paper
         </Button>
         <Button
@@ -130,9 +140,38 @@ interface ButtonProps {
   onClick: () => void;
   buttonStatus?: boolean;
 }
+
+const buttonVariants = {
+  active: {
+    scale: 1,
+    opacity: 1,
+    filter: "grayscale(0%)",
+    backgroundColor: "#fcfcfd",
+  },
+  hover: { scale: 1.1, backgroundColor: "#00b371ff" },
+  tap: { scale: 0.95 },
+  disabled: {
+    scale: 1,
+    opacity: 0.5,
+    filter: "grayscale(100%)",
+    cursor: "not-allowed",
+    backgroundColor: "#fcfcfd",
+  },
+};
+
 function Button({ children, onClick, buttonStatus }: ButtonProps) {
   return (
-    <motion.button className="btn" onClick={onClick} disabled={buttonStatus}>
+    <motion.button
+      className={styles.btn}
+      variants={buttonVariants}
+      whileHover={buttonStatus ? {} : "hover"}
+      whileTap={buttonStatus ? undefined : "tap"}
+      animate={buttonStatus ? "disabled" : "active"}
+      initial={false}
+      transition={{ duration: 0.3 }}
+      onClick={onClick}
+      disabled={buttonStatus}
+    >
       {children}
     </motion.button>
   );
