@@ -3,6 +3,9 @@
   grid-template-columns: 1fr 1fr;
   justify-content: center;
   gap: 20px;
+  box-sizing: border-box;
+  align-content: start;
+  padding-top: 20px;
 }
 
 .gamebox img {

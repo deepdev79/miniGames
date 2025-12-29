@@ -131,7 +131,9 @@ function Rps() {
           Scissors
         </Button>
       </div>
-      <Button onClick={() => dispatch({ type: "reset" })}>Reset</Button>
+      <Button onClick={() => dispatch({ type: "reset" })}>
+        {buttonStatus ? "Play Again" : "Reset"}
+      </Button>
     </div>
   );
 }

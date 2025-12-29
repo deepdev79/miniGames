@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import Rps from "./pages/Rps";
 import TicTacToe from "./pages/TicTacToe";
 import PokemonMemory from "./pages/PokemonMemory";
+import SimonSays from "./pages/SimonSays";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/rps" element={<Rps />} />
         <Route path="/ttt" element={<TicTacToe />} />
         <Route path="/pokemon" element={<PokemonMemory />} />
+        <Route path="/simonsays" element={<SimonSays />} />
       </Routes>
     </BrowserRouter>
   );

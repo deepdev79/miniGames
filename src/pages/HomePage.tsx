@@ -23,6 +23,9 @@ function HomePage() {
         <GameBox gamepic={Pikachu} path="/pokemon">
           <p>Pokemon memory game</p>
         </GameBox>
+        <GameBox gamepic="" path="/simonsays">
+          <p>Simon says</p>
+        </GameBox>
       </div>
     </div>
   );
