@@ -1,8 +1,32 @@
 import { motion } from "motion/react";
 import styles from "./SimonSays.module.css";
-import { Children, useReducer, useState } from "react";
+import { useReducer, type ReactNode } from "react";
 
-const initialState = {
+interface Button {
+  id: number;
+  bgColor: string;
+  orgBgColor: string;
+  popColor: string;
+}
+
+interface State {
+  buttons: Button[];
+  sequence: number[];
+  userTurn: boolean;
+  score: number;
+  highScore: number;
+  currentUserStep: number;
+}
+
+type Action =
+  | { type: "flash"; payload: number }
+  | { type: "unFlash"; payload: number }
+  | { type: "addNewSeq"; payload: number }
+  | { type: "userClick"; payload: number }
+  | { type: "endGame" }
+  | { type: "reset" };
+
+const initialState: State = {
   buttons: [
     {
       id: 1,
@@ -32,9 +56,11 @@ const initialState = {
   sequence: [],
   userTurn: false,
   currentUserStep: 0,
+  score: 0,
+  highScore: 0,
 };
 
-function reducer(state, action) {
+function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "flash":
       return {
@@ -54,7 +80,21 @@ function reducer(state, action) {
       return {
         ...state,
         sequence: [...state.sequence, action.payload],
+        currentUserStep: 0,
       };
+    case "userClick":
+      const isCorrect =
+        state.sequence[state.currentUserStep] === action.payload;
+      if (!isCorrect) {
+        console.log("Incorrect");
+        // return initialState; // Reset game
+      } else console.log("correct");
+      return { ...state, currentUserStep: state.currentUserStep + 1 };
+
+    case "endGame":
+      return initialState;
+    case "reset":
+      return initialState;
     default:
       return state;
   }
@@ -62,37 +102,28 @@ function reducer(state, action) {
 
 function SimonSays() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [flashId, setFlashId] = useState<Number[]>([]);
-  const [endGame, setEndGame] = useState(false);
-  const [checkCounter, setCheckCounter] = useState(0);
 
-  function handleUserClick(clickedId) {
+  function handleUserClick(clickedId: number) {
     memoryFlash(clickedId);
-    if (clickedId === state.sequence[checkCounter]) console.log("success");
-    else console.log("fail");
-
-    setCheckCounter((s) => s + 1);
-
-    // if (clickedId === flashId[checkCounter]) console.log("success");
-    // else console.log("fail");
+    dispatch({ type: "userClick", payload: clickedId });
+    if (state.currentUserStep + 1 === state.sequence.length) {
+      setTimeout(gameStart, 2000);
+    }
   }
 
   function gameStart() {
-    let sequenceToPlay = [];
-    for (let i = 0; i < 5; i++) {
-      const rng = Math.floor(Math.random() * 4) + 1;
-      dispatch({ type: "addNewSeq", payload: rng });
-      sequenceToPlay = [...state.sequence, rng];
-    }
+    const rng = Math.floor(Math.random() * 4) + 1;
+    dispatch({ type: "addNewSeq", payload: rng });
+    const sequenceToPlay = [...state.sequence, rng];
     playSequence(sequenceToPlay);
   }
-  async function playSequence(sequence: []) {
+  async function playSequence(sequence: number[]) {
     for (const buttonId of sequence) {
       memoryFlash(buttonId);
       await new Promise((resolve) => setTimeout(resolve, 600));
     }
   }
-  function memoryFlash(id) {
+  function memoryFlash(id: number) {
     dispatch({ type: "flash", payload: id });
 
     setTimeout(function () {
@@ -102,6 +133,10 @@ function SimonSays() {
 
   return (
     <div>
+      <div className={styles.scores}>
+        <p>Score: {state.score}</p>
+        <p>HighScore: {state.highScore}</p>
+      </div>
       <div className={styles.gamebox}>
         {state.buttons.map((btn) => (
           <Button
@@ -114,14 +149,23 @@ function SimonSays() {
       <Button bgColor={"#ffff"} onClick={() => gameStart()}>
         Start
       </Button>
-      <Button bgColor={"#ffff"} onClick={() => setEndGame(true)}>
+      <Button bgColor={"#ffff"} onClick={() => dispatch({ type: "endGame" })}>
         End
+      </Button>
+      <Button bgColor={"#ffff"} onClick={() => dispatch({ type: "reset" })}>
+        Reset
       </Button>
     </div>
   );
 }
 
-function Button({ children, bgColor, onClick }) {
+interface ButtonProps {
+  bgColor: string;
+  children?: ReactNode;
+  onClick: () => void;
+}
+
+function Button({ children, bgColor, onClick }: ButtonProps) {
   return (
     <motion.button style={{ backgroundColor: bgColor }} onClick={onClick}>
       {children}

@@ -7,3 +7,9 @@
   height: 300px;
   margin-bottom: 30px;
 }
+
+.scores {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
