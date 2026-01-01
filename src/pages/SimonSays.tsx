@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import styles from "./SimonSays.module.css";
-import { useReducer, type ReactNode } from "react";
+import { useEffect, useReducer, type ReactNode } from "react";
 
 interface Button {
   id: number;
@@ -13,6 +13,7 @@ interface State {
   buttons: Button[];
   sequence: number[];
   userTurn: boolean;
+  gameStatus: boolean;
   score: number;
   highScore: number;
   currentUserStep: number;
@@ -21,6 +22,7 @@ interface State {
 type Action =
   | { type: "flash"; payload: number }
   | { type: "unFlash"; payload: number }
+  | { type: "setUserTurn"; payload: boolean }
   | { type: "addNewSeq"; payload: number }
   | { type: "userClick"; payload: number }
   | { type: "endGame" }
@@ -54,6 +56,7 @@ const initialState: State = {
     },
   ],
   sequence: [],
+  gameStatus: false,
   userTurn: false,
   currentUserStep: 0,
   score: 0,
@@ -81,20 +84,35 @@ function reducer(state: State, action: Action): State {
         ...state,
         sequence: [...state.sequence, action.payload],
         currentUserStep: 0,
+        score: state.sequence.length,
+        userTurn: false,
       };
+    case "setUserTurn":
+      return { ...state, userTurn: action.payload };
     case "userClick":
       const isCorrect =
         state.sequence[state.currentUserStep] === action.payload;
       if (!isCorrect) {
-        console.log("Incorrect");
-        // return initialState; // Reset game
-      } else console.log("correct");
-      return { ...state, currentUserStep: state.currentUserStep + 1 };
+        return {
+          ...initialState,
+          highScore:
+            state.highScore < state.score ? state.score : state.highScore,
+        };
+      }
+      return {
+        ...state,
+        currentUserStep: state.currentUserStep + 1,
+        userTurn: state.currentUserStep + 1 !== state.sequence.length,
+      };
 
     case "endGame":
-      return initialState;
+      return {
+        ...initialState,
+        highScore:
+          state.highScore < state.score ? state.score : state.highScore,
+      };
     case "reset":
-      return initialState;
+      return { ...initialState, highScore: state.highScore };
     default:
       return state;
   }
@@ -103,25 +121,24 @@ function reducer(state: State, action: Action): State {
 function SimonSays() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  function handleUserClick(clickedId: number) {
-    memoryFlash(clickedId);
-    dispatch({ type: "userClick", payload: clickedId });
-    if (state.currentUserStep + 1 === state.sequence.length) {
-      setTimeout(gameStart, 2000);
-    }
+  function startGame() {
+    dispatch({ type: "reset" });
+    setTimeout(gameStart, 100);
   }
-
-  function gameStart() {
+  async function gameStart() {
     const rng = Math.floor(Math.random() * 4) + 1;
     dispatch({ type: "addNewSeq", payload: rng });
     const sequenceToPlay = [...state.sequence, rng];
-    playSequence(sequenceToPlay);
+    await playSequence(sequenceToPlay);
   }
   async function playSequence(sequence: number[]) {
+    dispatch({ type: "setUserTurn", payload: false });
+    await new Promise((resolve) => setTimeout(resolve, 500));
     for (const buttonId of sequence) {
       memoryFlash(buttonId);
       await new Promise((resolve) => setTimeout(resolve, 600));
     }
+    dispatch({ type: "setUserTurn", payload: true });
   }
   function memoryFlash(id: number) {
     dispatch({ type: "flash", payload: id });
@@ -130,6 +147,23 @@ function SimonSays() {
       dispatch({ type: "unFlash", payload: id });
     }, 400);
   }
+
+  function handleUserClick(clickedId: number) {
+    if (!state.userTurn) return;
+    memoryFlash(clickedId);
+    dispatch({ type: "userClick", payload: clickedId });
+  }
+  useEffect(() => {
+    if (
+      state.sequence.length > 0 &&
+      state.currentUserStep === state.sequence.length
+    ) {
+      const timer = setTimeout(() => {
+        gameStart();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.currentUserStep, state.sequence.length]);
 
   return (
     <div>
@@ -146,7 +180,7 @@ function SimonSays() {
           ></Button>
         ))}
       </div>
-      <Button bgColor={"#ffff"} onClick={() => gameStart()}>
+      <Button bgColor={"#ffff"} onClick={startGame}>
         Start
       </Button>
       <Button bgColor={"#ffff"} onClick={() => dispatch({ type: "endGame" })}>
