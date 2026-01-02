@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import styles from "./SimonSays.module.css";
 import { useEffect, useReducer, type ReactNode } from "react";
+import { playTone, playErrorSound } from "../utils/simonSaysSounds";
 
 interface Button {
   id: number;
@@ -17,6 +18,7 @@ interface State {
   score: number;
   highScore: number;
   currentUserStep: number;
+  handleStartButton: boolean;
 }
 
 type Action =
@@ -61,6 +63,7 @@ const initialState: State = {
   currentUserStep: 0,
   score: 0,
   highScore: 0,
+  handleStartButton: false,
 };
 
 function reducer(state: State, action: Action): State {
@@ -97,6 +100,7 @@ function reducer(state: State, action: Action): State {
           ...initialState,
           highScore:
             state.highScore < state.score ? state.score : state.highScore,
+          handleStartButton: false,
         };
       }
       return {
@@ -110,9 +114,14 @@ function reducer(state: State, action: Action): State {
         ...initialState,
         highScore:
           state.highScore < state.score ? state.score : state.highScore,
+        handleStartButton: false,
       };
     case "reset":
-      return { ...initialState, highScore: state.highScore };
+      return {
+        ...initialState,
+        highScore: state.highScore,
+        handleStartButton: true,
+      };
     default:
       return state;
   }
@@ -121,14 +130,21 @@ function reducer(state: State, action: Action): State {
 function SimonSays() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  function handleResetButton() {
+    dispatch({ type: "reset" });
+    setTimeout(() => gameStart(true), 300);
+  }
+
   function startGame() {
     dispatch({ type: "reset" });
-    setTimeout(gameStart, 100);
+    setTimeout(() => gameStart(true), 100);
   }
-  async function gameStart() {
+
+  async function gameStart(resetPattern: boolean = false) {
     const rng = Math.floor(Math.random() * 4) + 1;
     dispatch({ type: "addNewSeq", payload: rng });
-    const sequenceToPlay = [...state.sequence, rng];
+    const currentSequence = resetPattern ? [] : state.sequence;
+    const sequenceToPlay = [...currentSequence, rng];
     await playSequence(sequenceToPlay);
   }
   async function playSequence(sequence: number[]) {
@@ -141,6 +157,7 @@ function SimonSays() {
     dispatch({ type: "setUserTurn", payload: true });
   }
   function memoryFlash(id: number) {
+    playTone(id);
     dispatch({ type: "flash", payload: id });
 
     setTimeout(function () {
@@ -150,8 +167,14 @@ function SimonSays() {
 
   function handleUserClick(clickedId: number) {
     if (!state.userTurn) return;
-    memoryFlash(clickedId);
-    dispatch({ type: "userClick", payload: clickedId });
+    const expectedId = state.sequence[state.currentUserStep];
+    if (clickedId === expectedId) {
+      memoryFlash(clickedId);
+      dispatch({ type: "userClick", payload: clickedId });
+    } else {
+      playErrorSound();
+      dispatch({ type: "userClick", payload: clickedId });
+    }
   }
   useEffect(() => {
     if (
@@ -180,15 +203,32 @@ function SimonSays() {
           ></Button>
         ))}
       </div>
-      <Button bgColor={"#ffff"} onClick={startGame}>
-        Start
-      </Button>
-      <Button bgColor={"#ffff"} onClick={() => dispatch({ type: "endGame" })}>
-        End
-      </Button>
-      <Button bgColor={"#ffff"} onClick={() => dispatch({ type: "reset" })}>
-        Reset
-      </Button>
+      <div className={styles.options}>
+        <Button
+          classProp={state.handleStartButton ? styles.btnDisabled : styles.btn}
+          bgColor={"#fa6400"}
+          onClick={startGame}
+          buttonStatus={state.handleStartButton}
+        >
+          Start
+        </Button>
+        <Button
+          classProp={state.handleStartButton ? styles.btn : styles.btnDisabled}
+          bgColor={"#fa6400"}
+          onClick={() => dispatch({ type: "endGame" })}
+          buttonStatus={!state.handleStartButton}
+        >
+          End
+        </Button>
+        <Button
+          classProp={state.handleStartButton ? styles.btn : styles.btnDisabled}
+          bgColor={"#fa6400"}
+          onClick={handleResetButton}
+          buttonStatus={!state.handleStartButton}
+        >
+          Reset
+        </Button>
+      </div>
     </div>
   );
 }
@@ -196,12 +236,27 @@ function SimonSays() {
 interface ButtonProps {
   bgColor: string;
   children?: ReactNode;
+  buttonStatus?: boolean;
   onClick: () => void;
+  classProp?: string;
 }
 
-function Button({ children, bgColor, onClick }: ButtonProps) {
+function Button({
+  children,
+  bgColor,
+  onClick,
+  buttonStatus,
+  classProp,
+}: ButtonProps) {
   return (
-    <motion.button style={{ backgroundColor: bgColor }} onClick={onClick}>
+    <motion.button
+      className={classProp}
+      style={{ backgroundColor: bgColor }}
+      onClick={onClick}
+      disabled={buttonStatus}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+    >
       {children}
     </motion.button>
   );
