@@ -5,6 +5,7 @@ import PaperImage from "../assets/rps/paper.png";
 import ScissorImage from "../assets/rps/scissor.png";
 import waitImage from "../assets/rps/wait.png";
 import { motion } from "framer-motion";
+import GoHome from "../components/GoHome";
 
 const IMAGE_MAP: Record<string, string> = {
   Rock: RockImage,
@@ -100,7 +101,8 @@ function Rps() {
     dispatch,
   ] = useReducer(reducer, initialState);
   return (
-    <div>
+    <div className={styles.rootCopy}>
+      <GoHome />
       <h1>Welcome</h1>
       <h3>{message}</h3>
       <div className={styles.gamebox}>

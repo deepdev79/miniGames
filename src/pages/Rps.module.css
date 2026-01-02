@@ -1,3 +1,9 @@
+.rootCopy {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+}
+
 .gamebox {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -30,4 +36,7 @@
   border-width: 0;
   font-family: "JetBrains Mono", monospace;
   margin-top: 3%;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
 }

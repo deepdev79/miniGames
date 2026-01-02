@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import styles from "./SimonSays.module.css";
 import { useEffect, useReducer, type ReactNode } from "react";
 import { playTone, playErrorSound } from "../utils/simonSaysSounds";
+import GoHome from "../components/GoHome";
 
 interface Button {
   id: number;
@@ -19,6 +20,7 @@ interface State {
   highScore: number;
   currentUserStep: number;
   handleStartButton: boolean;
+  handleGameButton: boolean;
 }
 
 type Action =
@@ -64,6 +66,7 @@ const initialState: State = {
   score: 0,
   highScore: 0,
   handleStartButton: false,
+  handleGameButton: false,
 };
 
 function reducer(state: State, action: Action): State {
@@ -91,7 +94,11 @@ function reducer(state: State, action: Action): State {
         userTurn: false,
       };
     case "setUserTurn":
-      return { ...state, userTurn: action.payload };
+      return {
+        ...state,
+        userTurn: action.payload,
+        handleGameButton: !state.handleGameButton,
+      };
     case "userClick":
       const isCorrect =
         state.sequence[state.currentUserStep] === action.payload;
@@ -189,7 +196,9 @@ function SimonSays() {
   }, [state.currentUserStep, state.sequence.length]);
 
   return (
-    <div>
+    <div className={styles.rootCopy}>
+      <GoHome />
+      <h1>Welcome</h1>
       <div className={styles.scores}>
         <p>Score: {state.score}</p>
         <p>HighScore: {state.highScore}</p>
@@ -200,6 +209,7 @@ function SimonSays() {
             onClick={() => handleUserClick(btn.id)}
             bgColor={btn.bgColor}
             key={btn.id}
+            buttonStatus={state.handleGameButton}
           ></Button>
         ))}
       </div>

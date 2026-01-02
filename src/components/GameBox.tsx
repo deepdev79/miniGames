@@ -1,22 +1,24 @@
 import { Link } from "react-router-dom";
 import styles from "./GameBox.module.css";
 import type { ReactNode } from "react";
+import { motion } from "motion/react";
 
 interface GameBoxProps {
   children: ReactNode;
   gamepic: string;
   path: string;
+  variants: {};
 }
 
-function GameBox({ children, gamepic, path }: GameBoxProps) {
+function GameBox({ variants, children, gamepic, path }: GameBoxProps) {
   return (
-    <div className={styles.gameBox}>
+    <motion.div variants={variants} className={styles.gameBox}>
       <img src={gamepic} alt="" />
       {children}
       <Link to={path}>
         <button>Play Now</button>
       </Link>
-    </div>
+    </motion.div>
   );
 }
 
