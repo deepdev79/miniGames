@@ -7,6 +7,7 @@ import PokemonMemory from "./pages/PokemonMemory";
 import SimonSays from "./pages/SimonSays";
 import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
+import Snake from "./pages/Snake";
 
 function App() {
   return (
@@ -58,6 +59,14 @@ function AnimatedRoutes() {
           element={
             <PageTransistion>
               <SimonSays />
+            </PageTransistion>
+          }
+        />
+        <Route
+          path="/snake"
+          element={
+            <PageTransistion>
+              <Snake />
             </PageTransistion>
           }
         />

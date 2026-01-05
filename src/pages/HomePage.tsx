@@ -47,6 +47,9 @@ function HomePage() {
         <GameBox variants={item} gamepic={simonSaysImage} path="/simonsays">
           <p>Simon says</p>
         </GameBox>
+        <GameBox variants={item} gamepic={simonSaysImage} path="/snake">
+          <p>Snake</p>
+        </GameBox>
       </motion.div>
     </div>
   );
