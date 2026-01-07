@@ -13,10 +13,6 @@
   grid-template-columns: repeat(20, 1fr);
 }
 
-.cell {
-  border: 0.5px solid black;
-}
-
 .prey {
   background-color: red;
   border-radius: 50%;
@@ -24,4 +20,65 @@
 
 .snake {
   background-color: green;
+}
+
+.scores,
+.options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.scores {
+  margin-bottom: 40px;
+}
+
+.scores p {
+  margin: 0;
+  padding: 12px 24px;
+  background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 2px solid #3a3a3a;
+  min-width: 140px;
+  text-align: center;
+}
+.scores p:first-child {
+  border-color: #2a5a8a;
+  color: #6ad4ff;
+}
+
+.scores p:last-child {
+  border-color: #8a5a2a;
+  color: #ffd06a;
+}
+
+.options {
+  flex-direction: column;
+  margin-top: 2%;
+}
+.btn {
+  align-items: center;
+  background-clip: padding-box;
+  background-color: #fa6400;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+}
+
+.btn:hover {
+  scale: 1.1;
 }

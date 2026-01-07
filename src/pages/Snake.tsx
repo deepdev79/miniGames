@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import GoHome from "../components/GoHome";
 import styles from "./Snake.module.css";
 
@@ -7,13 +7,16 @@ const GAMEGRID = Array.from({ length: GRID_SIZE }, () =>
   new Array(GRID_SIZE).fill("")
 );
 type Direction = "ArrowRight" | "ArrowLeft" | "ArrowUp" | "ArrowDown";
-
+// type Difficulty = "Rookie" | "Easy" | "Medium" | "Hard";
+// type Speed = Record<Difficulty, number>;
 type Coordinate = [number, number];
 interface State {
   direction: Direction;
   snake: Coordinate[];
   food: Coordinate;
   score: number;
+  highScore: number;
+  speed: number;
 }
 
 const initialState: State = {
@@ -23,22 +26,35 @@ const initialState: State = {
     [4, 5],
     [3, 5],
   ],
-  food: generateFood(),
+  food: generateFood([
+    [5, 5],
+    [4, 5],
+    [3, 5],
+  ]),
   score: 0,
+  highScore: 0,
+  speed: 500,
 };
 
-function generateFood(): Coordinate {
-  const x = Math.floor(Math.random() * GRID_SIZE);
-  const y = Math.floor(Math.random() * GRID_SIZE);
-  return [x, y];
-}
+function generateFood(snake: Coordinate[]): Coordinate {
+  let newFood: Coordinate;
+  let isOnSnake: boolean;
 
+  do {
+    const x = Math.floor(Math.random() * GRID_SIZE);
+    const y = Math.floor(Math.random() * GRID_SIZE);
+    newFood = [x, y];
+    isOnSnake = snake.some(([sx, sy]) => sx === x && sy === y);
+  } while (isOnSnake);
+
+  return newFood;
+}
 type Action =
   | { type: "ArrowUp" }
   | { type: "ArrowDown" }
   | { type: "ArrowRight" }
   | { type: "ArrowLeft" }
-  | { type: "reset" }
+  | { type: "reset"; payload?: number }
   | { type: "foodEncounter"; payload: Coordinate }
   | { type: "changeDirection"; payload: Coordinate };
 
@@ -65,26 +81,30 @@ function reducer(state: State, action: Action): State {
         };
       return state;
     case "foodEncounter":
+      const newSnake = [action.payload, ...state.snake];
       return {
         ...state,
-        snake: [action.payload, ...state.snake],
-        food: generateFood(),
+        snake: newSnake,
+        food: generateFood(newSnake),
         score: state.score + 1,
       };
     case "changeDirection":
       return { ...state, snake: [action.payload, ...state.snake.slice(0, -1)] };
     case "reset":
-      return initialState;
+      return {
+        ...initialState,
+        highScore:
+          state.highScore < state.score ? state.score : state.highScore,
+        speed: action.payload ? action.payload : state.speed,
+      };
     default:
       return state;
   }
 }
 
 function Snake() {
-  const [{ direction, snake, food, score }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ direction, snake, food, score, highScore, speed }, dispatch] =
+    useReducer(reducer, initialState);
 
   function isSnakeBody(xc: number, yc: number): boolean {
     return snake.some(([x, y]) => {
@@ -134,30 +154,37 @@ function Snake() {
         newHead[0] < 0 ||
         newHead[0] >= GRID_SIZE ||
         newHead[1] < 0 ||
-        newHead[1] >= GRID_SIZE
+        newHead[1] >= GRID_SIZE ||
+        snake.some(([x, y]) => {
+          return newHead[0] === x && newHead[1] === y;
+        })
       ) {
         dispatch({ type: "reset" });
         return;
       }
 
       if (newHead[0] === food[0] && newHead[1] === food[1]) {
-        console.log("Food eaten! Snake length:", snake.length + 1);
         dispatch({ type: "foodEncounter", payload: newHead });
       } else {
         dispatch({ type: "changeDirection", payload: newHead });
       }
-    }, 1000);
+    }, speed);
     return () => clearInterval(moveInterval);
-  }, [snake, direction, food]);
+  }, [snake, direction, food, speed]);
   return (
     <div className={styles.mainContainer}>
       <GoHome />
-      <p>Score:{score}</p>
+      <h1>Welcome</h1>
+      <div className={styles.scores}>
+        <p>Score:{score}</p>
+        <p>High Score:{highScore}</p>
+      </div>
       <div className={styles.container}>
         {GAMEGRID.map((row, yc) => {
           return row.map((cell, xc) => {
             return (
               <div
+                key={`${xc}-${yc}`}
                 className={`${styles.cell} ${
                   isSnakeBody(xc, yc) ? styles.snake : ""
                 } ${food[0] === xc && food[1] === yc ? styles.prey : ""}`}
@@ -165,6 +192,41 @@ function Snake() {
             );
           });
         })}
+      </div>
+      <div className={styles.options}>
+        <button
+          className={styles.btn}
+          onClick={() => dispatch({ type: "reset" })}
+        >
+          Reset
+        </button>
+        <div className={styles.difficulty}>
+          <p>Difficulty:</p>
+          <button
+            className={styles.btn}
+            onClick={() => dispatch({ type: "reset", payload: 1000 })}
+          >
+            Rookie
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => dispatch({ type: "reset", payload: 500 })}
+          >
+            Easy
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => dispatch({ type: "reset", payload: 200 })}
+          >
+            Medium
+          </button>
+          <button
+            className={styles.btn}
+            onClick={() => dispatch({ type: "reset", payload: 100 })}
+          >
+            Hard
+          </button>
+        </div>
       </div>
     </div>
   );
