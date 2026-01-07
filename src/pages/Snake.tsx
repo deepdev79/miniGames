@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import GoHome from "../components/GoHome";
 import styles from "./Snake.module.css";
 
@@ -6,35 +6,43 @@ const GRID_SIZE = 20;
 const GAMEGRID = Array.from({ length: GRID_SIZE }, () =>
   new Array(GRID_SIZE).fill("")
 );
+type Direction = "ArrowRight" | "ArrowLeft" | "ArrowUp" | "ArrowDown";
 
-const initialDirection = {
+type Coordinate = [number, number];
+interface State {
+  direction: Direction;
+  snake: Coordinate[];
+  food: Coordinate;
+  score: number;
+}
+
+const initialState: State = {
   direction: "ArrowRight",
-  move: 1,
-  food: [],
+  snake: [
+    [5, 5],
+    [4, 5],
+    [3, 5],
+  ],
+  food: generateFood(),
+  score: 0,
 };
 
-// function directionReducer(state, action) {
-//   if (action.type === "ArrowUp" || action.type === "ArrowDown") {
-//     if (state.direction === "ArrowRight" || state.direction === "ArrowLeft")
-//       return {
-//         ...state,
-//         direction: action.type,
-//         move: action.type === "ArrowUp" ? -1 : 1,
-//       };
-//   }
+function generateFood(): Coordinate {
+  const x = Math.floor(Math.random() * GRID_SIZE);
+  const y = Math.floor(Math.random() * GRID_SIZE);
+  return [x, y];
+}
 
-//   if (action.type === "ArrowRight" || action.type === "ArrowLeft") {
-//     if (state.direction === "ArrowUp" || state.direction === "ArrowDown")
-//       return {
-//         ...state,
-//         direction: action.type,
-//         move: action.type === "ArrowLeft" ? -1 : 1,
-//       };
-//   }
+type Action =
+  | { type: "ArrowUp" }
+  | { type: "ArrowDown" }
+  | { type: "ArrowRight" }
+  | { type: "ArrowLeft" }
+  | { type: "reset" }
+  | { type: "foodEncounter"; payload: Coordinate }
+  | { type: "changeDirection"; payload: Coordinate };
 
-//   return state;
-// }
-function directionReducer(state, action) {
+function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "ArrowUp":
     case "ArrowDown":
@@ -44,7 +52,6 @@ function directionReducer(state, action) {
         return {
           ...state,
           direction: action.type,
-          move: action.type === "ArrowUp" ? -1 : 1,
         };
       return state;
     case "ArrowLeft":
@@ -55,25 +62,28 @@ function directionReducer(state, action) {
         return {
           ...state,
           direction: action.type,
-          move: action.type === "ArrowLeft" ? -1 : 1,
         };
       return state;
+    case "foodEncounter":
+      return {
+        ...state,
+        snake: [action.payload, ...state.snake],
+        food: generateFood(),
+        score: state.score + 1,
+      };
+    case "changeDirection":
+      return { ...state, snake: [action.payload, ...state.snake.slice(0, -1)] };
+    case "reset":
+      return initialState;
     default:
       return state;
   }
 }
 
-const initialSnake = [
-  [5, 5],
-  [4, 5],
-  [3, 5],
-];
 function Snake() {
-  const [snake, setSnake] = useState(initialSnake);
-  const [food, setFood] = useState(generateFood());
-  const [{ direction, move }, directionDispatch] = useReducer(
-    directionReducer,
-    initialDirection
+  const [{ direction, snake, food, score }, dispatch] = useReducer(
+    reducer,
+    initialState
   );
 
   function isSnakeBody(xc: number, yc: number): boolean {
@@ -90,7 +100,7 @@ function Snake() {
         event.key === "ArrowLeft" ||
         event.key === "ArrowRight"
       ) {
-        directionDispatch({ type: `${event.key}` });
+        dispatch({ type: `${event.key}` });
       }
     };
 
@@ -101,80 +111,48 @@ function Snake() {
     };
   }, []);
 
-  function generateFood() {
-    const x = Math.floor(Math.random() * GRID_SIZE);
-    const y = Math.floor(Math.random() * GRID_SIZE);
-    return [x, y];
-  }
-
-  const directionRef = useRef(direction);
-  const moveRef = useRef(move);
-
-  // useEffect(() => {
-
-  //   const moveInterval = setInterval(() => {
-  //     setSnake((prev) => {
-  //       let newHead = [];
-  //       if (direction === "ArrowRight" || direction === "ArrowLeft")
-  //         newHead = [prev[0][0] + move, prev[0][1]];
-  //       else newHead = [prev[0][0], prev[0][1] + move];
-
-  //       if (
-  //         newHead[0] < 0 ||
-  //         newHead[0] >= GRID_SIZE ||
-  //         newHead[1] < 0 ||
-  //         newHead[1] >= GRID_SIZE
-  //       ) {
-  //         return initialSnake;
-  //       }
-
-  //       if (
-  //         newHead[0] === foodRef.current[0] &&
-  //         newHead[1] === foodRef.current[1]
-  //       ) {
-  //         console.log("Food eaten! Snake length:", prev.length + 1);
-  //         foodRef.current = generateFood();
-  //         return [newHead, ...prev];
-  //       }
-  //       return [newHead, ...prev.slice(0, -1)];
-  //     });
-  //   }, 1000);
-  //   return () => clearInterval(moveInterval);
-  // }, [direction, move]);
   useEffect(() => {
     const moveInterval = setInterval(() => {
       const currentHead = snake[0];
-      let newHead = [];
+      let newHead: [number, number] = [0, 0];
 
-      if (direction === "ArrowRight" || direction === "ArrowLeft")
-        newHead = [currentHead[0] + move, currentHead[1]];
-      else newHead = [currentHead[0], currentHead[1] + move];
-
+      switch (direction) {
+        case "ArrowRight":
+          newHead = [currentHead[0] + 1, currentHead[1]];
+          break;
+        case "ArrowLeft":
+          newHead = [currentHead[0] - 1, currentHead[1]];
+          break;
+        case "ArrowUp":
+          newHead = [currentHead[0], currentHead[1] - 1];
+          break;
+        case "ArrowDown":
+          newHead = [currentHead[0], currentHead[1] + 1];
+          break;
+      }
       if (
         newHead[0] < 0 ||
         newHead[0] >= GRID_SIZE ||
         newHead[1] < 0 ||
         newHead[1] >= GRID_SIZE
       ) {
-        setSnake(initialSnake);
+        dispatch({ type: "reset" });
         return;
       }
 
       if (newHead[0] === food[0] && newHead[1] === food[1]) {
         console.log("Food eaten! Snake length:", snake.length + 1);
-
-        setFood(generateFood());
-        setSnake([newHead, ...snake]);
+        dispatch({ type: "foodEncounter", payload: newHead });
       } else {
-        setSnake([newHead, ...snake.slice(0, -1)]);
+        dispatch({ type: "changeDirection", payload: newHead });
       }
     }, 1000);
     return () => clearInterval(moveInterval);
-  }, [snake, direction, move, food]);
+  }, [snake, direction, food]);
   return (
     <div className={styles.mainContainer}>
       <GoHome />
-      <p>Score</p>
+      <p>Score:{score}</p>
       <div className={styles.container}>
         {GAMEGRID.map((row, yc) => {
           return row.map((cell, xc) => {
@@ -193,50 +171,3 @@ function Snake() {
 }
 
 export default Snake;
-
-// // 1. Change food to state for reactivity
-// const [food, setFood] = useState(generateFood());
-
-// // 2. Optimized Interval logic
-// useEffect(() => {
-//   const moveInterval = setInterval(() => {
-//     setSnake((prev) => {
-//       const head = prev[0];
-//       let newHead;
-
-//       // Calculate new head based on current direction/move
-//       if (direction === "ArrowRight" || direction === "ArrowLeft") {
-//         newHead = [head[0] + move, head[1]];
-//       } else {
-//         newHead = [head[0], head[1] + move];
-//       }
-
-//       // 1. Check Wall Collision
-//       if (
-//         newHead[0] < 0 || newHead[0] >= GRID_SIZE ||
-//         newHead[1] < 0 || newHead[1] >= GRID_SIZE
-//       ) {
-//         return initialSnake;
-//       }
-
-//       // 2. Check Self Collision (Recommended)
-//       if (prev.some(([x, y]) => x === newHead[0] && y === newHead[1])) {
-//         return initialSnake;
-//       }
-
-//       // 3. Check Food Collision
-//       const ateFood = newHead[0] === food[0] && newHead[1] === food[1];
-
-//       if (ateFood) {
-//         // Move food generation OUTSIDE the return to trigger correctly
-//         setFood(generateFood());
-//         return [newHead, ...prev]; // Grow: add head, keep all prev segments
-//       }
-
-//       // Normal move: add head, remove tail
-//       return [newHead, ...prev.slice(0, -1)];
-//     });
-//   }, 200); // 1000ms is very slow for Snake, try 200ms!
-
-//   return () => clearInterval(moveInterval);
-// }, [direction, move, food]); // Add food to dependencies so interval sees latest position
