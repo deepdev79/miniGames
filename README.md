@@ -12,6 +12,7 @@ The app contains following random mini games for you to enjoy and tinker around 
 
 Structure:
 
+```
 src/
 ├── assets/ # Static images, JSON data(attribution and Bulbasaur lottie loading)
 ├── components/ # Reusable UI components
@@ -22,3 +23,4 @@ src/
 ├── utils/ # Helper functions (Just one that gives Simon Says buttons sound)
 ├── App.tsx # Main router & Animated Transition logic
 └── main.tsx # Entry point
+```
