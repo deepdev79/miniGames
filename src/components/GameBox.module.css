@@ -10,8 +10,37 @@
 }
 
 .gameBox img {
-  width: 120px; /* Slightly larger for better visibility */
+  width: 120px;
   height: 120px;
   object-fit: contain;
   margin-bottom: 10px;
+}
+.btn {
+  box-sizing: border-box;
+  margin-top: auto;
+  margin-bottom: 15px;
+  background-color: #ffde00;
+  border-radius: 8px;
+  color: #000;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 12px 24px;
+  text-align: center;
+  width: 90%;
+  border: none;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 0px #b09a00;
+}
+
+.btn:hover {
+  background-color: #a38e06;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0px #b09a00;
+}
+
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px #b09a00;
 }

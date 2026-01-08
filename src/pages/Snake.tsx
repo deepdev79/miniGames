@@ -7,8 +7,6 @@ const GAMEGRID = Array.from({ length: GRID_SIZE }, () =>
   new Array(GRID_SIZE).fill("")
 );
 type Direction = "ArrowRight" | "ArrowLeft" | "ArrowUp" | "ArrowDown";
-// type Difficulty = "Rookie" | "Easy" | "Medium" | "Hard";
-// type Speed = Record<Difficulty, number>;
 type Coordinate = [number, number];
 interface State {
   direction: Direction;
@@ -102,6 +100,8 @@ function reducer(state: State, action: Action): State {
   }
 }
 
+// To improve game performance snake logic can be moved from moveInterval to reducer.
+
 function Snake() {
   const [{ direction, snake, food, score, highScore, speed }, dispatch] =
     useReducer(reducer, initialState);
@@ -120,6 +120,7 @@ function Snake() {
         event.key === "ArrowLeft" ||
         event.key === "ArrowRight"
       ) {
+        event.preventDefault();
         dispatch({ type: `${event.key}` });
       }
     };
@@ -174,14 +175,14 @@ function Snake() {
   return (
     <div className={styles.mainContainer}>
       <GoHome />
-      <h1>Welcome</h1>
+      <h1 style={{ marginBottom: "15px" }}>Welcome</h1>
       <div className={styles.scores}>
         <p>Score:{score}</p>
         <p>High Score:{highScore}</p>
       </div>
       <div className={styles.container}>
         {GAMEGRID.map((row, yc) => {
-          return row.map((cell, xc) => {
+          return row.map((_cell, xc) => {
             return (
               <div
                 key={`${xc}-${yc}`}
@@ -195,6 +196,7 @@ function Snake() {
       </div>
       <div className={styles.options}>
         <button
+          style={{ backgroundColor: "#fa6400" }}
           className={styles.btn}
           onClick={() => dispatch({ type: "reset" })}
         >
@@ -203,24 +205,28 @@ function Snake() {
         <div className={styles.difficulty}>
           <p>Difficulty:</p>
           <button
+            style={{ backgroundColor: "#0cf853ff" }}
             className={styles.btn}
             onClick={() => dispatch({ type: "reset", payload: 1000 })}
           >
             Rookie
           </button>
           <button
+            style={{ backgroundColor: "#eff315ff" }}
             className={styles.btn}
             onClick={() => dispatch({ type: "reset", payload: 500 })}
           >
             Easy
           </button>
           <button
+            style={{ backgroundColor: "#d73b10ff" }}
             className={styles.btn}
             onClick={() => dispatch({ type: "reset", payload: 200 })}
           >
             Medium
           </button>
           <button
+            style={{ backgroundColor: "#fa0000ff" }}
             className={styles.btn}
             onClick={() => dispatch({ type: "reset", payload: 100 })}
           >

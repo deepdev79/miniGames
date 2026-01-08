@@ -4,8 +4,10 @@ import rpsImage from "../assets/rps.png";
 import ticTacToeImage from "../assets/tictactoe.png";
 import Pikachu from "../assets/pikachu.png";
 import simonSaysImage from "../assets/ss.png";
+import snake from "../assets/snake.jpg";
 
 import { motion } from "motion/react";
+import Footer from "../components/Footer";
 
 function HomePage() {
   const container = {
@@ -22,8 +24,8 @@ function HomePage() {
     },
   };
   return (
-    <div>
-      <h1>Welcome to Mini Games</h1>
+    <div className={styles.container}>
+      <h1 className={styles.heading}>Welcome to Mini Games</h1>
       <motion.div
         className={styles.games}
         variants={container}
@@ -47,10 +49,11 @@ function HomePage() {
         <GameBox variants={item} gamepic={simonSaysImage} path="/simonsays">
           <p>Simon says</p>
         </GameBox>
-        <GameBox variants={item} gamepic={simonSaysImage} path="/snake">
+        <GameBox variants={item} gamepic={snake} path="/snake">
           <p>Snake</p>
         </GameBox>
       </motion.div>
+      <Footer />
     </div>
   );
 }

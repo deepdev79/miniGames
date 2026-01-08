@@ -1,0 +1,139 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-image: url("../assets/pokemonMemory/pikachu.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.heading {
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.loading,
+.scores,
+.options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.options {
+  gap: 5px;
+}
+
+.scores {
+  gap: 15px;
+}
+
+.scores p {
+  font-size: 1.5rem;
+  color: white;
+  font-weight: 500;
+}
+
+.scores span {
+  color: rgb(182, 3, 3);
+}
+
+.mons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 1%;
+}
+
+.mons img {
+  width: 200px;
+  max-width: 80%;
+  height: auto;
+  padding: 1%;
+}
+
+.box {
+  border: 1px solid black;
+  cursor: pointer;
+  border-radius: 5%;
+  background-color: rgba(247, 244, 244, 0.479);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.box:hover {
+  border-color: red;
+  transform: scale(1.05);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  padding: 3rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 4px solid #ffcb05;
+}
+
+.btn {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: rgba(238, 235, 10, 0.85);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  position: relative;
+  transition: all 250ms;
+
+  width: auto;
+}
+
+.btn:hover,
+.btn:focus {
+  border-color: rgb(244, 242, 242);
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  color: rgb(244, 242, 242);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  background-color: #f0f0f1;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+  color: rgba(0, 0, 0, 0.65);
+  transform: translateY(0);
+}

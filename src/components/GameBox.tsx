@@ -12,11 +12,15 @@ interface GameBoxProps {
 
 function GameBox({ variants, children, gamepic, path }: GameBoxProps) {
   return (
-    <motion.div variants={variants} className={styles.gameBox}>
+    <motion.div
+      variants={variants}
+      className={styles.gameBox}
+      whileHover={{ scale: 1.1 }}
+    >
       <img src={gamepic} alt="" />
       {children}
       <Link to={path}>
-        <button>Play Now</button>
+        <button className={styles.btn}>PLAY NOW</button>
       </Link>
     </motion.div>
   );

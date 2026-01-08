@@ -1,4 +1,5 @@
 .rootCopy {
+  margin-top: 10%;
   display: flex;
   flex-direction: column;
   place-items: center;

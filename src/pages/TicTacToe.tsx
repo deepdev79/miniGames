@@ -63,9 +63,19 @@ function TicTacToe() {
     : `Next Player: ${state.isXNext ? "X" : "O"}`;
 
   return (
-    <div>
+    <div style={{ marginTop: "5%" }}>
       <GoHome />
-      <h1>{status}</h1>
+      <h1 style={{ textAlign: "center", marginBottom: "5px" }}>Welcome</h1>
+      <p
+        style={{
+          textAlign: "center",
+          marginBottom: "5px",
+          fontWeight: "bold",
+          fontSize: "2rem",
+        }}
+      >
+        {status}
+      </p>
       <div className={styles.gamebox}>
         <ul className={styles.gameboard}>
           {state.board.map((value, index) => (

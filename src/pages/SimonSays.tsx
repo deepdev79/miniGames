@@ -198,7 +198,7 @@ function SimonSays() {
   return (
     <div className={styles.rootCopy}>
       <GoHome />
-      <h1>Welcome</h1>
+      <h1 style={{ marginBottom: "20px" }}>Welcome</h1>
       <div className={styles.scores}>
         <p>Score: {state.score}</p>
         <p>HighScore: {state.highScore}</p>
