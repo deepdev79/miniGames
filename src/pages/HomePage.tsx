@@ -34,23 +34,35 @@ function HomePage() {
       >
         <GameBox variants={item} gamepic={rpsImage} path="/rps">
           <p>
+            <span>Rock Paper Scissors</span>
             Challenge the computer in this timeless game of strategy and luck
           </p>
         </GameBox>
         <GameBox variants={item} gamepic={ticTacToeImage} path="/ttt">
           <p>
+            <span>Tic Tac Toe</span>
             Classic 3x3 battle against your friend. Can you find the perfect
             strategy?
           </p>
         </GameBox>
         <GameBox variants={item} gamepic={Pikachu} path="/pokemon">
-          <p>Pokemon memory game</p>
+          <p>
+            <span>Pokemon Memory</span>can you pick every card without ever
+            hitting the same one twice?
+          </p>
         </GameBox>
         <GameBox variants={item} gamepic={simonSaysImage} path="/simonsays">
-          <p>Simon says</p>
+          <p>
+            <span>Simon Says</span>
+            Test your focus and follow the rhythm in this vibrant challenge of
+            memory and patterns
+          </p>
         </GameBox>
         <GameBox variants={item} gamepic={snake} path="/snake">
-          <p>Snake</p>
+          <p>
+            <span>Classic Snake</span>Eat, grow, and survive—just don't bite
+            your own tail
+          </p>
         </GameBox>
       </motion.div>
       <Footer />

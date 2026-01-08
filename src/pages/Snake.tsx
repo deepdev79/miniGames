@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import GoHome from "../components/GoHome";
 import styles from "./Snake.module.css";
 
@@ -47,6 +47,7 @@ function generateFood(snake: Coordinate[]): Coordinate {
 
   return newFood;
 }
+
 type Action =
   | { type: "ArrowUp" }
   | { type: "ArrowDown" }
@@ -100,16 +101,29 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-// To improve game performance snake logic can be moved from moveInterval to reducer.
-
 function Snake() {
   const [{ direction, snake, food, score, highScore, speed }, dispatch] =
     useReducer(reducer, initialState);
+  const directionQueueRef = useRef<Direction[]>([]);
+  const lastProcessedDirectionRef = useRef<Direction>(direction);
 
   function isSnakeBody(xc: number, yc: number): boolean {
     return snake.some(([x, y]) => {
       return x === xc && y === yc;
     });
+  }
+
+  function isValidDirectionChange(
+    current: Direction,
+    next: Direction
+  ): boolean {
+    const opposites: Record<Direction, Direction> = {
+      ArrowUp: "ArrowDown",
+      ArrowDown: "ArrowUp",
+      ArrowLeft: "ArrowRight",
+      ArrowRight: "ArrowLeft",
+    };
+    return opposites[current] !== next;
   }
 
   useEffect(() => {
@@ -121,7 +135,21 @@ function Snake() {
         event.key === "ArrowRight"
       ) {
         event.preventDefault();
-        dispatch({ type: `${event.key}` });
+
+        const newDirection = event.key as Direction;
+        const currentDirection =
+          directionQueueRef.current.length > 0
+            ? directionQueueRef.current[directionQueueRef.current.length - 1]
+            : direction;
+
+        if (
+          isValidDirectionChange(currentDirection, newDirection) &&
+          currentDirection !== newDirection
+        ) {
+          if (directionQueueRef.current.length < 3) {
+            directionQueueRef.current.push(newDirection);
+          }
+        }
       }
     };
 
@@ -130,10 +158,16 @@ function Snake() {
     return () => {
       window.removeEventListener("keydown", handleSnakeDirection);
     };
-  }, []);
+  }, [direction]);
 
   useEffect(() => {
     const moveInterval = setInterval(() => {
+      if (directionQueueRef.current.length > 0) {
+        const nextDirection = directionQueueRef.current.shift()!;
+        dispatch({ type: nextDirection });
+        lastProcessedDirectionRef.current = nextDirection;
+      }
+
       const currentHead = snake[0];
       let newHead: [number, number] = [0, 0];
 
@@ -151,6 +185,7 @@ function Snake() {
           newHead = [currentHead[0], currentHead[1] + 1];
           break;
       }
+
       if (
         newHead[0] < 0 ||
         newHead[0] >= GRID_SIZE ||
@@ -160,6 +195,7 @@ function Snake() {
           return newHead[0] === x && newHead[1] === y;
         })
       ) {
+        directionQueueRef.current = [];
         dispatch({ type: "reset" });
         return;
       }
@@ -170,8 +206,10 @@ function Snake() {
         dispatch({ type: "changeDirection", payload: newHead });
       }
     }, speed);
+
     return () => clearInterval(moveInterval);
   }, [snake, direction, food, speed]);
+
   return (
     <div className={styles.mainContainer}>
       <GoHome />
@@ -198,7 +236,10 @@ function Snake() {
         <button
           style={{ backgroundColor: "#fa6400" }}
           className={styles.btn}
-          onClick={() => dispatch({ type: "reset" })}
+          onClick={() => {
+            directionQueueRef.current = [];
+            dispatch({ type: "reset" });
+          }}
         >
           Reset
         </button>
@@ -207,28 +248,40 @@ function Snake() {
           <button
             style={{ backgroundColor: "#0cf853ff" }}
             className={styles.btn}
-            onClick={() => dispatch({ type: "reset", payload: 1000 })}
+            onClick={() => {
+              directionQueueRef.current = [];
+              dispatch({ type: "reset", payload: 1000 });
+            }}
           >
             Rookie
           </button>
           <button
             style={{ backgroundColor: "#eff315ff" }}
             className={styles.btn}
-            onClick={() => dispatch({ type: "reset", payload: 500 })}
+            onClick={() => {
+              directionQueueRef.current = [];
+              dispatch({ type: "reset", payload: 500 });
+            }}
           >
             Easy
           </button>
           <button
             style={{ backgroundColor: "#d73b10ff" }}
             className={styles.btn}
-            onClick={() => dispatch({ type: "reset", payload: 200 })}
+            onClick={() => {
+              directionQueueRef.current = [];
+              dispatch({ type: "reset", payload: 200 });
+            }}
           >
             Medium
           </button>
           <button
             style={{ backgroundColor: "#fa0000ff" }}
             className={styles.btn}
-            onClick={() => dispatch({ type: "reset", payload: 100 })}
+            onClick={() => {
+              directionQueueRef.current = [];
+              dispatch({ type: "reset", payload: 100 });
+            }}
           >
             Hard
           </button>

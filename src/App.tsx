@@ -1,14 +1,17 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
-import HomePage from "./pages/HomePage";
-import Rps from "./pages/Rps";
-import TicTacToe from "./pages/TicTacToe";
-import PokemonMemory from "./pages/PokemonMemory";
-import SimonSays from "./pages/SimonSays";
 import { AnimatePresence, motion } from "motion/react";
 import type { ReactNode } from "react";
-import Snake from "./pages/Snake";
-import Credits from "./pages/Credits";
+import { lazy, Suspense } from "react";
+import HomePage from "./pages/HomePage";
+import PageNotFound from "./pages/PageNotFound";
+import Loading from "./components/Loading";
+const Rps = lazy(() => import("./pages/Rps"));
+const TicTacToe = lazy(() => import("./pages/TicTacToe"));
+const PokemonMemory = lazy(() => import("./pages/PokemonMemory"));
+const SimonSays = lazy(() => import("./pages/SimonSays"));
+const Snake = lazy(() => import("./pages/Snake"));
+const Credits = lazy(() => import("./pages/Credits"));
 
 function App() {
   return (
@@ -34,48 +37,68 @@ function AnimatedRoutes() {
         <Route
           path="/rps"
           element={
-            <PageTransistion>
-              <Rps />
-            </PageTransistion>
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <Rps />
+              </PageTransistion>
+            </Suspense>
           }
         />
         <Route
           path="/ttt"
           element={
-            <PageTransistion>
-              <TicTacToe />
-            </PageTransistion>
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <TicTacToe />
+              </PageTransistion>
+            </Suspense>
           }
         />
         <Route
           path="/pokemon"
           element={
-            <PageTransistion>
-              <PokemonMemory />
-            </PageTransistion>
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <PokemonMemory />
+              </PageTransistion>
+            </Suspense>
           }
         />
         <Route
           path="/simonsays"
           element={
-            <PageTransistion>
-              <SimonSays />
-            </PageTransistion>
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <SimonSays />
+              </PageTransistion>
+            </Suspense>
           }
         />
         <Route
           path="/snake"
           element={
-            <PageTransistion>
-              <Snake />
-            </PageTransistion>
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <Snake />
+              </PageTransistion>
+            </Suspense>
           }
         />
         <Route
           path="/credits"
           element={
+            <Suspense fallback={<Loading />}>
+              <PageTransistion>
+                <Credits />
+              </PageTransistion>
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
             <PageTransistion>
-              <Credits />
+              <PageNotFound />
             </PageTransistion>
           }
         />
