@@ -1,6 +1,6 @@
 Welcome this is a practice project built with React, Vite, and Framer Motion.
 
-It's Single Page Application made using react-router, lazy loading was implemented to mainly handle 2 interrelated heavy dependencies(lottie-web and bulbasaur.json) but then spread to all pages.
+It's Single Page Application made using react-router, lazy loading was implemented to mainly handle 2 interrelated heavy dependencies(lottie-web and bulbasaur.json in Pokemon Memory game) but then used in all games.
 
 The app contains following random mini games for you to enjoy and tinker around with:
 
